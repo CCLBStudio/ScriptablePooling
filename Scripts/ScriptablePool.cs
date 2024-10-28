@@ -107,6 +107,38 @@ namespace CCLBStudio.ScriptablePooling
             return key;
         }
 
+        public T RequestObjectAs<T>() where T : IScriptablePooledObject
+        {
+            if (!_init)
+            {
+                Debug.LogWarning($"Pool {name} has not been initialized, performing an auto initialize.");
+                Initialize();
+            }
+
+            if (_available.Count <= 0)
+            {
+                CreatePooledObject();
+            }
+
+            var key = _available.Keys.First();
+
+            if(key is not T casted)
+            {
+                Debug.LogError($"Pool {name} does not contains pooled objects of type {nameof(T)}");
+                return default(T);
+            }
+
+            var obj = _available[key];
+
+            _available.Remove(key);
+            _inUse[key] = obj;
+
+            obj.SetActive(enableObjectOnRequest);
+            key.OnObjectRequested();
+
+            return casted;
+        }
+
         public void ReleaseObject(IScriptablePooledObject pooledObject)
         {
             if (!_init)
