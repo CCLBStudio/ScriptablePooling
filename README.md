@@ -1,2 +1,2 @@
 # ScriptablePooling
-An object pooling system throught scriptable objects
+An object pooling system throught scriptable objects for Unity projects.
