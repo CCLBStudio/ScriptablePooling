@@ -42,7 +42,7 @@ namespace CCLBStudio.ScriptablePooling
             CreatePoolContainer();
             for (int i = 0; i < quantityToInstantiate; i++)
             { 
-                CreatePoolObject();
+                CreatePooledObject();
             }
         }
 
@@ -61,7 +61,7 @@ namespace CCLBStudio.ScriptablePooling
 
         #region Pooled Object Mehtods
 
-        private void CreatePoolObject()
+        private void CreatePooledObject()
         {
             if (!pooledObjectPrefab)
             {
@@ -78,6 +78,7 @@ namespace CCLBStudio.ScriptablePooling
 
             spo.Pool = this;
             _available[spo] = obj;
+            spo.OnObjectCreated();
             obj.SetActive(!disableObjectOnCreation);
         }
 
@@ -91,13 +92,17 @@ namespace CCLBStudio.ScriptablePooling
             
             if (_available.Count <= 0)
             {
-                CreatePoolObject();
+                CreatePooledObject();
             }
 
             var key = _available.Keys.First();
-            _available[key].SetActive(enableObjectOnRequest);
-            _inUse[key] = _available[key];
+            var obj = _available[key];
+            
             _available.Remove(key);
+            _inUse[key] = obj;
+
+            obj.SetActive(enableObjectOnRequest);
+            key.OnObjectRequested();
 
             return key;
         }
