@@ -158,6 +158,7 @@ namespace CCLBStudio.ScriptablePooling
             _available[pooledObject] = obj;
             
             obj.SetActive(!disableObjectOnRelease);
+            pooledObject.OnObjectReleased();
         }
 
         #endregion
